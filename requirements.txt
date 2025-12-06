@@ -1,0 +1,8 @@
+streamlit
+transformers
+torch
+sentencepiece
+# Google GenAI SDK (Gemini). Install the official package:
+google-generativeai
+# If pip package name differs for you, try: google-genai or python-genai
+python-dotenv
