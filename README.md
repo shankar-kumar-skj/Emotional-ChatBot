@@ -1,9 +1,9 @@
 # Emotional Chatbot Using NLP + Sentiment Analysis + Gemini LLM 🤖
 
+This project is an **emotion-aware chatbot** built using a hybrid approach combining classic Natural Language Processing (NLP) techniques with the power of modern Large Language Models (LLMs).
+
 ## Deploy
 https://emotional-chatbot-czipakvbe7dgqfhcvp3qwp.streamlit.app/#emotional-chatbot-gemini-nlp-sentiment
-
-This project is an **emotion-aware chatbot** built using a hybrid approach combining classic Natural Language Processing (NLP) techniques with the power of modern Large Language Models (LLMs).
 
 It utilizes:
 
