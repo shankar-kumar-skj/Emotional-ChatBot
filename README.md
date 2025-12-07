@@ -1,218 +1,258 @@
-# Emotional Chatbot Using NLP + Sentiment Analysis + Gemini LLM
+Emotional Chatbot Using NLP + Sentiment Analysis + Emotion Detection + Gemini LLM
 
-This project is an **emotion-aware chatbot** built using:
+This project is an emotion-aware conversational AI chatbot built using:
 
-* **NLP preprocessing**
-* **Sentiment analysis (HuggingFace models)**
-* **Emotion classification**
-* **Google Gemini LLM** for intelligent emotional responses
-* **Streamlit** for UI
+Custom NLP preprocessing
 
-It takes user input → processes emotion → generates an emotionally aligned reply.
+Sentiment analysis (HuggingFace)
 
----
+Emotion detection (RoBERTa emotional model)
 
-# 📌 Project Structure
+Intent detection using Gemini LLM
 
+Adaptive emotional response generation
+
+Streamlit UI with conversation history
+
+The system takes user input → analyzes emotion/sentiment → detects user intent → generates an emotionally aligned AI response.
+
+📌 Project Structure
 emotional_chatbot/
-│── app_streamlit.py
-│── llm_module.py
-│── nlp_module.py
-│── sentiment_module.py
-│── .env
+│── app_streamlit.py       # Main Streamlit UI
+│── nlp_module.py          # Text preprocessing utilities
+│── sentiment_module.py    # Sentiment + emotion detection
+│── llm_module.py          # Gemini + GPT-2 fallback LLM interface
+│── .env                   # GEMINI_API_KEY stored here
 │── requirements.txt
 │── README.md
 
-yaml
-Copy code
+📌 How The System Works (Flow Diagram)
+      USER INPUT
+          |
+          v
+ ┌─────────────────┐
+ │  NLP Processing │  ← (nlp_module.py)
+ └─────────────────┘
+          |
+          v
+ ┌────────────────────────┐
+ │ Sentiment Detection    │
+ │ Emotion Classification │ ← (sentiment_module.py)
+ └────────────────────────┘
+          |
+          v
+ ┌───────────────────────────────┐
+ │ Intent Detection (Gemini LLM) │
+ └───────────────────────────────┘
+          |
+          v
+ ┌──────────────────────────────────────┐
+ │ Emotion-Aware Response Generation    │ ← (llm_module.py)
+ └──────────────────────────────────────┘
+          |
+          v
+     STREAMLIT CHATBOT UI
 
----
+📌 Setup Instructions
 
-# 📌 How The System Works (Flow Diagram)
-
-pgsql
-Copy code
-  USER INPUT
-      |
-      v
-┌─────────────────┐
-│ NLP Processing │ <- (nlp_module.py)
-└─────────────────┘
-|
-v
-┌────────────────────────┐
-│ Sentiment Analysis │
-│ Emotion Classification │ <- (sentiment_module.py)
-└────────────────────────┘
-|
-v
-┌───────────────────────────────┐
-│ Gemini LLM Prompt Engineering │ <- (llm_module.py)
-└───────────────────────────────┘
-|
-v
-┌────────────────────────────┐
-│ Generate Response (LLM) │
-└────────────────────────────┘
-|
-v
-CHATBOT RESPONSE
-
-yaml
-Copy code
-
----
-
-# 📌 Setup Instructions (Step-by-Step)
-
-### **1. Clone the repository**
-
+1. Clone the Repository
+```bash
 git clone https://github.com/shankar-kumar-skj/Emotional-ChatBot.git
 cd Emotional-ChatBot
 
-markdown
-Copy code
+2. Create .env file
 
-### **2. Create `.env` file**
+Add your Gemini API key:
 
-GEMINI_API_KEY=your_api_key_here
+GEMINI_API_KEY=your_key_here
 
-markdown
-Copy code
-
-### **3. Install required packages**
-
+3. Install dependencies
 pip install -r requirements.txt
 
-markdown
-Copy code
-
-### **4. Run the project**
-
+4. Run the app
 streamlit run app_streamlit.py
 
-yaml
-Copy code
+🟦 1. nlp_module.py — Text Preprocessing
+Purpose
 
----
+Clean and normalize raw user text before sending to models.
 
-# 📌 Code Explanation (Module-by-Module)
+Key Function
+preprocess_text(text)
 
-Below is a **clear, block-by-block explanation** of every file.
+Strips whitespace
 
----
+Normalizes multiple spaces
 
-# 🟦 1. `nlp_module.py` — NLP Preprocessing
+Prepares clean text for:
 
-### **Purpose:**
-Prepare user's text before sentiment analysis or LLM input.
+sentiment model
 
-### **Main Functions:**
+emotion model
 
-#### **a) `preprocess_text(text)`**
-* Strips extra spaces
-* Normalizes text
-* Removes unnecessary characters
+LLM
 
-### **Flow:**
-Input text → cleaned text → return
+Flow
+Raw text → cleaned → returned
 
-yaml
-Copy code
+🟩 2. sentiment_module.py — Sentiment + Emotion Detection
+Purpose
 
----
+Detect user sentiment and emotion using HuggingFace models.
 
-# 🟩 2. `sentiment_module.py` — Sentiment + Emotion Detection
+Models Used
 
-### **Purpose:**
-Detect **how the user feels**.
+sentiment-analysis (DistilBERT)
 
-### **Uses Two Models:**
-1. **Sentiment model**: Positive / Negative / Neutral
-2. **Emotion model**: joy, anger, sadness, fear, love, etc.
+j-hartmann/emotion-english-distilroberta-base
 
-### **Main Functions:**
+Main Functions
+detect_sentiment(text)
 
-#### **a) `detect_sentiment(text)`**
-* Uses HuggingFace DistilBERT
-* Returns sentiment label + confidence score
+Returns:
 
-#### **b) `detect_emotion(text)`**
-* Uses RoBERTa emotion model
-* Returns highest-scored emotion
+{
+  "label": "POSITIVE | NEGATIVE | NEUTRAL",
+  "score": 0.85
+}
 
-### **Flow:**
-Input text → HF models → sentiment + emotion → return
+detect_emotion(text)
 
-yaml
-Copy code
+Returns:
 
----
+{
+  "emotion": "joy | anger | sadness | fear | love | etc.",
+  "score": 0.77
+}
 
-# 🟨 3. `llm_module.py` — Gemini LLM Integration + Fallback
+Flow
+Input → HF Pipeline → sentiment + emotion → return
 
-### **Purpose:**
-Generate chatbot responses using Gemini LLM.
+🟨 3. llm_module.py — Gemini LLM + GPT-2 Fallback
+Purpose
 
-### **Features:**
-* Loads `.env` for GEMINI_API_KEY
-* Uses **Gemini 2.5 Flash** model
-* Adds emotional context to prompts
-* Fallback to GPT-2 if Gemini unavailable
+Generate responses with emotional awareness and intent understanding.
 
-### **Main Steps:**
-1. Load key & configure Gemini
-2. Build dynamic prompt with system instructions + user input
-3. Generate response (Gemini or GPT-2 fallback)
+Features
 
-### **Flow:**
-cleaned text + emotions → system prompt → Gemini → chatbot reply
+Loads .env for API key
 
-markdown
-Copy code
+Configures Gemini 2.5 Flash
 
----
+Adds dynamic system prompts
 
-# 🟥 4. `app_streamlit.py` — Main Frontend (UI)
+Injects user intent and emotional context
 
-### **Purpose:**
-Provide a user interface for chatbot interaction.
+Includes GPT-2 fallback if Gemini unavailable
 
-### **Key Components:**
-* **Title & layout**: `st.title("Emotional Chatbot — NLP + Sentiment + LLM")`
-* **Input box**: `user_text = st.text_area("You:")`
-* **Send button flow**:
-  1. Preprocess text → `preprocess_text()`
-  2. Detect sentiment → `detect_sentiment()`
-  3. Detect emotion → `detect_emotion()`
-  4. Build LLM prompt → `generate_llm()`
-  5. Save conversation to session history
-* **Conversation history**: Displays previous messages
+Key Function
+generate_llm(prompt, model, max_output_tokens, temperature, user_need=None)
 
-### **Flow:**
-UI input → NLP → sentiment/emotion detection → LLM → output display
+Builds system prompt
 
-yaml
-Copy code
+Adds optional “user need” context
 
----
+Sends request to Gemini
 
-# 🎯 Summary of Chatbot Pipeline
+Falls back to DistilGPT-2 if needed
 
-1. User sends message  
-2. Text preprocessing (`nlp_module.py`)  
-3. Sentiment & emotion detection (`sentiment_module.py`)  
-4. System prompt prepared  
-5. Gemini generates empathetic reply (`llm_module.py`)  
-6. Output displayed on Streamlit UI (`app_streamlit.py`)
+Flow
+(text + sentiment + emotion + intent) → prompt → Gemini → response
 
----
+🟥 4. app_streamlit.py — Main Frontend Application
+Purpose
 
-# 🚀 Future Enhancements
+Provide a clean UI for interacting with the emotional chatbot.
 
-* Persistent chat memory
-* Voice input (STT)
-* Voice output (TTS)
-* Database logging
-* Animated and interactive UI
-* Multi-language support
+Key Features
+
+Input text area
+
+Optional “What do you need help with?” field
+
+Conversation history sidebar
+
+Emotion-aware tone switching:
+
+empathetic tone if sadness/fear/anger
+
+friendly tone otherwise
+
+Main Steps on “Send” Button
+
+Preprocess text
+
+Detect sentiment
+
+Detect emotion
+
+Detect user's intent via Gemini
+
+Build emotionally adaptive prompt
+
+Generate final chatbot reply
+
+Save conversation to session
+
+Display conversation details:
+
+chatbot reply
+
+detected sentiment
+
+detected emotion
+
+detected intent
+
+Flow
+UI input → NLP → sentiment/emotion → intent detection → Gemini response → displayed to user
+
+🎯 Chatbot Workflow Summary
+1. User sends a message
+
+⬇️
+
+2. Text is cleaned
+
+⬇️
+
+3. Sentiment & emotion detected
+
+⬇️
+
+4. Intent extracted via Gemini
+
+⬇️
+
+5. Emotion-aware response generated
+
+⬇️
+
+6. Chat history updated
+
+⬇️
+
+7. Response displayed in Streamlit
+
+⬇️
+
+8. User continues conversation
+🚀 Possible Future Enhancements
+
+Here are several improvements you can add later:
+
+Memory-enhanced LLM (chat context injection)
+
+Voice input/output
+
+Cloud database logging (Firebase / Supabase / MongoDB)
+
+Animated chat interface
+
+User authentication
+
+Multi-language support
+
+Browser-based speech emotion recognition
+
+If you want, I can generate any of these features, including full code.
