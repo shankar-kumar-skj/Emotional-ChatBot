@@ -25,13 +25,10 @@ def detect_sentiment(text):
 
 def detect_emotion(text):
     res = emotion(text)
-
-    # always unwrap first level
-    res = res[0] if isinstance(res[0], list) else res[0]
-
-    top = max(res, key=lambda x: x["score"])
-
-    return {
-        "emotion": top["label"],
-        "score": float(top["score"])
-    }
+    # If the first element is a list, unwrap it; otherwise res itself is the list of dicts
+    if isinstance(res[0], list):
+        scores = res[0]
+    else:
+        scores = res
+    top = max(scores, key=lambda x: x["score"])
+    return {"emotion": top["label"], "score": float(top["score"])}
